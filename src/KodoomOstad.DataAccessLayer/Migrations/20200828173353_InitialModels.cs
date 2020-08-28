@@ -80,7 +80,7 @@ namespace KodoomOstad.DataAccessLayer.Migrations
                         column: x => x.FacultyId,
                         principalTable: "Faculties",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -104,19 +104,19 @@ namespace KodoomOstad.DataAccessLayer.Migrations
                         column: x => x.PollQuestionId,
                         principalTable: "PollQuestions",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Answers_Professors_ProfessorId",
                         column: x => x.ProfessorId,
                         principalTable: "Professors",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Answers_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -141,7 +141,7 @@ namespace KodoomOstad.DataAccessLayer.Migrations
                         column: x => x.ProfessorId,
                         principalTable: "Professors",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Comments_Comments_ReplyToId",
                         column: x => x.ReplyToId,
@@ -153,7 +153,7 @@ namespace KodoomOstad.DataAccessLayer.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -179,13 +179,13 @@ namespace KodoomOstad.DataAccessLayer.Migrations
                         column: x => x.ProfessorId,
                         principalTable: "Professors",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Courses_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(

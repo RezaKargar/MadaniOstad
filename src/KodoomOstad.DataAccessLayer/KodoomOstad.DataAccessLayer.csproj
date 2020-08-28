@@ -5,6 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20200828125805_InitialModels.cs" />
+    <Compile Remove="Migrations\20200828171533_InitialModels.cs" />
+    <Compile Remove="Migrations\20200828171533_InitialModels.Designer.cs" />
+    <Compile Remove="Migrations\20200828173042_InitialModels.cs" />
+    <Compile Remove="Migrations\20200828173042_InitialModels.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\KodoomOstad.Entities\KodoomOstad.Entities.csproj" />
   </ItemGroup>
 

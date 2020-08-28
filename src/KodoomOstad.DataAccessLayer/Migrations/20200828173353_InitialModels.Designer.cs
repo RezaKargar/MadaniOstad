@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KodoomOstad.DataAccessLayer.Migrations
 {
     [DbContext(typeof(KodoomOstadDbContext))]
-    [Migration("20200828125805_InitialModels")]
+    [Migration("20200828173353_InitialModels")]
     partial class InitialModels
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -283,19 +283,19 @@ namespace KodoomOstad.DataAccessLayer.Migrations
                     b.HasOne("KodoomOstad.Entities.Models.PollQuestion", "PollQuestion")
                         .WithMany("Answers")
                         .HasForeignKey("PollQuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("KodoomOstad.Entities.Models.Professor", "Professor")
                         .WithMany("Answers")
                         .HasForeignKey("ProfessorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("KodoomOstad.Entities.Models.User", "User")
                         .WithMany("Answers")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -304,7 +304,7 @@ namespace KodoomOstad.DataAccessLayer.Migrations
                     b.HasOne("KodoomOstad.Entities.Models.Professor", "Professor")
                         .WithMany("Collection")
                         .HasForeignKey("ProfessorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("KodoomOstad.Entities.Models.Comment", "ReplyTo")
@@ -314,7 +314,7 @@ namespace KodoomOstad.DataAccessLayer.Migrations
                     b.HasOne("KodoomOstad.Entities.Models.User", "User")
                         .WithMany("Comments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -323,13 +323,13 @@ namespace KodoomOstad.DataAccessLayer.Migrations
                     b.HasOne("KodoomOstad.Entities.Models.Professor", "Professor")
                         .WithMany("Courses")
                         .HasForeignKey("ProfessorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("KodoomOstad.Entities.Models.User", "User")
                         .WithMany("Courses")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -338,7 +338,7 @@ namespace KodoomOstad.DataAccessLayer.Migrations
                     b.HasOne("KodoomOstad.Entities.Models.Faculty", "Faculty")
                         .WithMany("Professors")
                         .HasForeignKey("FacultyId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

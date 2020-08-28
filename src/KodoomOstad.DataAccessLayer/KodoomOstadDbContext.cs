@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using KodoomOstad.Common.Utilities;
 
 namespace KodoomOstad.DataAccessLayer
 {
@@ -14,21 +15,6 @@ namespace KodoomOstad.DataAccessLayer
             : base(options)
         {
         }
-
-        public DbSet<Answer> Answers { get; set; }
-
-        public DbSet<Comment> Comments { get; set; }
-
-        public DbSet<Course> Courses { get; set; }
-
-        public DbSet<Faculty> Faculties { get; set; }
-
-        public DbSet<PollQuestion> PollQuestions { get; set; }
-
-        public DbSet<Professor> Professors { get; set; }
-
-        public DbSet<User> Users { get; set; }
-
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
@@ -50,7 +36,17 @@ namespace KodoomOstad.DataAccessLayer
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Use reflection to find models and add them to model builder
+            modelBuilder.RegisterAllEntities<IEntity>(typeof(IEntity).Assembly);
+
+            // Add model configurations to model builder
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(KodoomOstadDbContext).Assembly);
+
+            // Make delete behavior for all relations in models to be RESTRICT
+            modelBuilder.AddRestrictDeleteBehaviorConvention();
+
+            // Make name of models to be plural (User => Users)
+            modelBuilder.AddPluralizingTableNameConvention();
         }
     }
 }
