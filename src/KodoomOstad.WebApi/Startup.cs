@@ -1,6 +1,7 @@
 using KodoomOstad.DataAccessLayer;
 using KodoomOstad.DataAccessLayer.Contracts;
 using KodoomOstad.DataAccessLayer.Repositories;
+using KodoomOstad.IocConfig.CustomMapping;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,8 @@ namespace KodoomOstad.WebApi
             {
                 options.UseSqlServer(Configuration.GetConnectionString("KodoomOstadDatabase"));
             });
+
+            services.InitializeAutoMapper();
 
             services.AddControllers();
 
