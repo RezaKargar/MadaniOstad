@@ -2,12 +2,12 @@ using KodoomOstad.DataAccessLayer;
 using KodoomOstad.DataAccessLayer.Contracts;
 using KodoomOstad.DataAccessLayer.Repositories;
 using KodoomOstad.IocConfig.CustomMapping;
+using KodoomOstad.IocConfig.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace KodoomOstad.WebApi
 {
@@ -38,10 +38,7 @@ namespace KodoomOstad.WebApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseCustomExceptionHandler();
 
             app.UseHttpsRedirection();
 
