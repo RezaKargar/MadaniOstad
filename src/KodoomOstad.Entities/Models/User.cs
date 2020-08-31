@@ -1,21 +1,19 @@
 ﻿using KodoomOstad.Entities.Models.Base;
+using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 
 namespace KodoomOstad.Entities.Models
 {
-    public class User : AuditableBaseEntity
+    public class User : IdentityUser<int>, IAuditableBaseEntity
     {
         public string Name { get; set; }
 
         public string StudentId { get; set; }
 
-        public string Email { get; set; }
+        public DateTime CreatedAt { get; set; }
 
-        public string Phone { get; set; }
-
-        public string Password { get; set; }
-
-        public string Role { get; set; }
+        public DateTime? LastModifiedAt { get; set; }
 
         public ICollection<Comment> Comments { get; set; }
 

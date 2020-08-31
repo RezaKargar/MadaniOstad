@@ -2,7 +2,14 @@
 
 namespace KodoomOstad.Entities.Models.Base
 {
-    public abstract class AuditableBaseEntity<TKey> : BaseEntity<TKey>
+    public interface IAuditableBaseEntity : IEntity
+    {
+        DateTime CreatedAt { get; set; }
+
+        DateTime? LastModifiedAt { get; set; }
+    }
+
+    public abstract class AuditableBaseEntity<TKey> : BaseEntity<TKey>, IAuditableBaseEntity
     {
         public DateTime CreatedAt { get; set; }
 

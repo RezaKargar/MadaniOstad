@@ -1,14 +1,16 @@
-﻿using KodoomOstad.Entities.Models;
+﻿using KodoomOstad.Common.Utilities;
+using KodoomOstad.Entities.Models;
 using KodoomOstad.Entities.Models.Base;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using KodoomOstad.Common.Utilities;
 
 namespace KodoomOstad.DataAccessLayer
 {
-    public class KodoomOstadDbContext : DbContext
+    public class KodoomOstadDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
 
         public KodoomOstadDbContext(DbContextOptions<KodoomOstadDbContext> options)
@@ -18,7 +20,7 @@ namespace KodoomOstad.DataAccessLayer
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
-            foreach (var entry in ChangeTracker.Entries<AuditableBaseEntity>())
+            foreach (var entry in ChangeTracker.Entries<IAuditableBaseEntity>())
             {
                 switch (entry.State)
                 {
@@ -36,6 +38,8 @@ namespace KodoomOstad.DataAccessLayer
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             // Use reflection to find models and add them to model builder
             modelBuilder.RegisterAllEntities<IEntity>(typeof(IEntity).Assembly);
 
