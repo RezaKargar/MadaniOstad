@@ -5,8 +5,10 @@ using KodoomOstad.DataAccessLayer.Repositories;
 using KodoomOstad.IocConfig.Configurations;
 using KodoomOstad.IocConfig.CustomMapping;
 using KodoomOstad.IocConfig.Middlewares;
+using KodoomOstad.Services.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,9 +42,14 @@ namespace KodoomOstad.WebApi
 
             services.InitializeAutoMapper();
 
-            services.AddControllers();
+            services.AddControllers(options =>
+                options.Filters.Add(new AuthorizeFilter()));
 
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+            services.AddScoped<IJwtService, JwtService>();
+
+            services.AddJwtAuthentication(_siteSetting.JwtSettings);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,6 +61,7 @@ namespace KodoomOstad.WebApi
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
