@@ -5,6 +5,8 @@ using KodoomOstad.DataAccessLayer;
 using KodoomOstad.Entities.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -103,6 +105,19 @@ namespace KodoomOstad.IocConfig.Configurations
                         throw new UnauthorizedException("Authentication needed");
                     }
                 };
+            });
+        }
+
+        public static void AddCustomApiVersioning(this IServiceCollection services)
+        {
+            services.AddApiVersioning(options =>
+            {
+                options.ApiVersionReader = new UrlSegmentApiVersionReader();
+
+                options.ReportApiVersions = true;
+
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(1, 0);
             });
         }
     }

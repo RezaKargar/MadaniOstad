@@ -50,6 +50,9 @@ namespace KodoomOstad.WebApi
             services.AddScoped<IJwtService, JwtService>();
 
             services.AddJwtAuthentication(_siteSetting.JwtSettings);
+
+            services.AddCustomApiVersioning();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
