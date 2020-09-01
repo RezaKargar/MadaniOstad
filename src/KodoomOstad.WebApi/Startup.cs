@@ -5,6 +5,7 @@ using KodoomOstad.DataAccessLayer.Repositories;
 using KodoomOstad.IocConfig.Configurations;
 using KodoomOstad.IocConfig.CustomMapping;
 using KodoomOstad.IocConfig.Middlewares;
+using KodoomOstad.IocConfig.SwaggerConfigurations;
 using KodoomOstad.Services.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -53,6 +54,7 @@ namespace KodoomOstad.WebApi
 
             services.AddCustomApiVersioning();
 
+            services.AddSwagger();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +63,8 @@ namespace KodoomOstad.WebApi
             app.UseCustomExceptionHandler();
 
             app.UseHttpsRedirection();
+
+            app.UseSwaggerAndUI();
 
             app.UseRouting();
 
@@ -71,6 +75,8 @@ namespace KodoomOstad.WebApi
             {
                 endpoints.MapControllers();
             });
+
+            app.UseStaticFiles();
         }
     }
 }
