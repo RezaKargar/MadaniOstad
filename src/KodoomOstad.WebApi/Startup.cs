@@ -38,6 +38,8 @@ namespace KodoomOstad.WebApi
                 options.UseSqlServer(Configuration.GetConnectionString("KodoomOstadDatabase"));
             });
 
+            services.AddCors();
+
             services.AddCustomIdentity(_siteSetting.IdentitySettings);
 
             services.InitializeAutoMapper();
@@ -59,6 +61,13 @@ namespace KodoomOstad.WebApi
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCustomExceptionHandler();
+
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
 
             app.UseHttpsRedirection();
 
