@@ -9,7 +9,6 @@ using KodoomOstad.IocConfig.SwaggerConfigurations;
 using KodoomOstad.Services.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,8 +42,7 @@ namespace KodoomOstad.WebApi
 
             services.InitializeAutoMapper();
 
-            services.AddControllers(options =>
-                options.Filters.Add(new AuthorizeFilter()));
+            services.AddControllers();
 
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
