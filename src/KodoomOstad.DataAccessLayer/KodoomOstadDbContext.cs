@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,8 +17,8 @@ namespace KodoomOstad.DataAccessLayer
         public KodoomOstadDbContext(DbContextOptions<KodoomOstadDbContext> options)
             : base(options)
         {
-        }
-
+        } 
+        
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
             foreach (var entry in ChangeTracker.Entries<IAuditableBaseEntity>())
@@ -29,6 +30,20 @@ namespace KodoomOstad.DataAccessLayer
                         break;
                     case EntityState.Modified:
                         entry.Entity.LastModifiedAt = DateTime.Now;
+                        break;
+                }
+            }
+
+            foreach (var entry in ChangeTracker.Entries().Where(x => x.Properties.Any(b => b.Metadata.Name == "IsDeleted")))
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entry.CurrentValues["IsDeleted"] = false;
+                        break;
+                    case EntityState.Deleted:
+                        entry.State = EntityState.Modified;
+                        entry.CurrentValues["IsDeleted"] = true;
                         break;
                 }
             }

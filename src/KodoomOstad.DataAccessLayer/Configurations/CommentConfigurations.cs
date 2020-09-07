@@ -9,6 +9,8 @@ namespace KodoomOstad.DataAccessLayer.Configurations
         public void Configure(EntityTypeBuilder<Comment> builder)
         {
             builder.HasKey(e => e.Id);
+
+            builder.HasQueryFilter(e => EF.Property<bool>(e, "IsDeleted") == false);
         }
     }
 }
