@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -57,6 +58,21 @@ namespace KodoomOstad.Services.Services
             var list = new List<Claim>(result.Claims);
 
             return list;
+        }
+
+        public JwtSecurityToken ReadToken(string token)
+        {
+            token = token?.Replace("Bearer ", string.Empty);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var readToken = tokenHandler.ReadJwtToken(token);
+            return readToken;
+        }
+
+        public string GetIdFromToken(string token)
+        {
+            token = token?.Replace("Bearer ", string.Empty);
+            var readToken = ReadToken(token);
+            return readToken.Claims.SingleOrDefault(c => c.Type == "nameid")?.Value;
         }
     }
 }
