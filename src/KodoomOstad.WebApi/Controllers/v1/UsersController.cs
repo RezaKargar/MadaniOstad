@@ -181,7 +181,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
             var comment = user.Comments.SingleOrDefault(c => c.Id == commentId);
 
             if (comment == null)
-                return NotFound("Comment not found.");
+                return NotFound("Comment of user not found.");
 
 
             var dto = _mapper.Map<CommentsOutputDto>(comment);
@@ -213,7 +213,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
             var course = user.Courses.SingleOrDefault(c => c.Id == courseId);
 
             if (course == null)
-                return NotFound("Course not found.");
+                return NotFound("Course of user not found.");
 
 
             var dto = _mapper.Map<CoursesOutputDto>(course);
@@ -245,7 +245,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
             var answer = user.Answers.SingleOrDefault(c => c.Id == answerId);
 
             if (answer == null)
-                return NotFound("Answer not found.");
+                return NotFound("Answer of user not found.");
 
 
             var dto = _mapper.Map<AnswersOutputDto>(answer);
