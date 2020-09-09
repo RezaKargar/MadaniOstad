@@ -14,7 +14,7 @@ namespace KodoomOstad.Entities.Models
 
         public ICollection<Answer> Answers { get; set; }
 
-        public ICollection<Comment> Collection { get; set; }
+        public ICollection<Comment> Comments { get; set; }
 
         public ICollection<Course> Courses { get; set; }
     }
