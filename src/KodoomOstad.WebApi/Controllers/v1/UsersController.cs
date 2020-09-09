@@ -143,8 +143,6 @@ namespace KodoomOstad.WebApi.Controllers.v1
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
-            var token = _jwtService.ReadToken(Request.Headers["Authorization"]);
-
             var user = await _userManager.FindByIdAsync(id.ToString());
 
             if (user == null)

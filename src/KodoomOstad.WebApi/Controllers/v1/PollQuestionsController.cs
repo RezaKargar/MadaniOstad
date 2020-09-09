@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using KodoomOstad.DataAccessLayer.Contracts;
 using KodoomOstad.Entities.Models;
+using KodoomOstad.WebApi.Models.Answers;
 using KodoomOstad.WebApi.Models.PollQuestions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using KodoomOstad.WebApi.Models.Answers;
 
 namespace KodoomOstad.WebApi.Controllers.v1
 {
@@ -57,7 +57,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             var createdPollQuestion = _mapper.Map<PollQuestionOutputDto>(pollQuestion);
 
-            return Created("api/v1/PollQuestions/" + createdPollQuestion.Id, createdPollQuestion);
+            return Created($"api/v1/PollQuestions/{createdPollQuestion.Id}", createdPollQuestion);
         }
 
         [HttpPut("{id}")]
