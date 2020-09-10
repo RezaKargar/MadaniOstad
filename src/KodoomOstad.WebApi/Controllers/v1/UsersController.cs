@@ -12,11 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
-using KodoomOstad.Common.Utilities;
 
 namespace KodoomOstad.WebApi.Controllers.v1
 {
@@ -93,6 +90,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Get()
         {
             var userDtos = _mapper.Map<List<UsersOutputDto>>(_userManager.Users);
@@ -100,12 +98,23 @@ namespace KodoomOstad.WebApi.Controllers.v1
             return Ok(userDtos);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id, CancellationToken cancellationToken)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)
                 return NotFound();
+
+            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
+            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
+
+            var isAdmin = await _userManager.IsInRoleAsync(userWhoSentRequest, "Admin");
+
+            var isUserHimSelfRequesting = userWhoSentRequest.Id == user.Id;
+
+            if (!isAdmin && !isUserHimSelfRequesting)
+                return Forbid();
 
             var userDto = _mapper.Map<UsersOutputDto>(user);
             return Ok(userDto);
@@ -126,7 +135,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
             var isAdmin = await _userManager.IsInRoleAsync(userWhoSentRequest, "Admin");
 
             var isUserHimSelfUpdating = userWhoSentRequest.Id == user.Id;
-            
+
             if (!isAdmin && !isUserHimSelfUpdating)
                 return Forbid();
 
@@ -155,6 +164,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
             return NoContent();
         }
 
+        [Authorize]
         [HttpGet("{id}/[action]")]
         public async Task<IActionResult> Comments(int id, CancellationToken cancellationToken)
         {
@@ -163,11 +173,22 @@ namespace KodoomOstad.WebApi.Controllers.v1
             if (user == null)
                 return NotFound("User not found.");
 
+            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
+            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
+
+            var isAdmin = await _userManager.IsInRoleAsync(userWhoSentRequest, "Admin");
+
+            var isUserHimSelfRequesting = userWhoSentRequest.Id == user.Id;
+
+            if (!isAdmin && !isUserHimSelfRequesting)
+                return Forbid();
+
             var comments = _mapper.Map<List<CommentsOutputDto>>(user.Comments);
 
             return Ok(comments);
         }
 
+        [Authorize]
         [HttpGet("{userId}/[action]/{commentId}")]
         public async Task<IActionResult> Comments(int userId, int commentId, CancellationToken cancellationToken)
         {
@@ -175,6 +196,16 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             if (user == null)
                 return NotFound("User not found.");
+            
+            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
+            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
+
+            var isAdmin = await _userManager.IsInRoleAsync(userWhoSentRequest, "Admin");
+
+            var isUserHimSelfRequesting = userWhoSentRequest.Id == user.Id;
+
+            if (!isAdmin && !isUserHimSelfRequesting)
+                return Forbid();
 
             var comment = user.Comments.SingleOrDefault(c => c.Id == commentId);
 
@@ -187,6 +218,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
             return Ok(dto);
         }
 
+        [Authorize]
         [HttpGet("{id}/[action]")]
         public async Task<IActionResult> Courses(int id, CancellationToken cancellationToken)
         {
@@ -195,11 +227,22 @@ namespace KodoomOstad.WebApi.Controllers.v1
             if (user == null)
                 return NotFound("User not found.");
 
+            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
+            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
+
+            var isAdmin = await _userManager.IsInRoleAsync(userWhoSentRequest, "Admin");
+
+            var isUserHimSelfRequesting = userWhoSentRequest.Id == user.Id;
+
+            if (!isAdmin && !isUserHimSelfRequesting)
+                return Forbid();
+
             var courses = _mapper.Map<List<CoursesOutputDto>>(user.Courses);
 
             return Ok(courses);
         }
 
+        [Authorize]
         [HttpGet("{userId}/[action]/{courseId}")]
         public async Task<IActionResult> Courses(int userId, int courseId, CancellationToken cancellationToken)
         {
@@ -207,6 +250,16 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             if (user == null)
                 return NotFound("User not found.");
+
+            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
+            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
+
+            var isAdmin = await _userManager.IsInRoleAsync(userWhoSentRequest, "Admin");
+
+            var isUserHimSelfRequesting = userWhoSentRequest.Id == user.Id;
+
+            if (!isAdmin && !isUserHimSelfRequesting)
+                return Forbid();
 
             var course = user.Courses.SingleOrDefault(c => c.Id == courseId);
 
@@ -227,6 +280,16 @@ namespace KodoomOstad.WebApi.Controllers.v1
             if (user == null)
                 return NotFound("User not found.");
 
+            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
+            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
+
+            var isAdmin = await _userManager.IsInRoleAsync(userWhoSentRequest, "Admin");
+
+            var isUserHimSelfRequesting = userWhoSentRequest.Id == user.Id;
+
+            if (!isAdmin && !isUserHimSelfRequesting)
+                return Forbid();
+
             var answers = _mapper.Map<List<AnswersOutputDto>>(user.Answers);
 
             return Ok(answers);
@@ -239,6 +302,16 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             if (user == null)
                 return NotFound("User not found.");
+
+            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
+            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
+
+            var isAdmin = await _userManager.IsInRoleAsync(userWhoSentRequest, "Admin");
+
+            var isUserHimSelfRequesting = userWhoSentRequest.Id == user.Id;
+
+            if (!isAdmin && !isUserHimSelfRequesting)
+                return Forbid();
 
             var answer = user.Answers.SingleOrDefault(c => c.Id == answerId);
 
