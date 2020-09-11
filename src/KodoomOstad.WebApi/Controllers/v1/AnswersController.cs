@@ -104,7 +104,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             var createdAnswer = _mapper.Map<AnswersOutputDto>(answer);
 
-            return Created($"/api/v1/Answers/{createdAnswer.Id}", createdAnswer);
+            return Created($"api/v1/Answers/{createdAnswer.Id}", createdAnswer);
         }
 
         [Authorize]
@@ -144,7 +144,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
         [Authorize]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Put(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
             var answer = await _answerRepository.GetByIdAsync(cancellationToken, id);
 

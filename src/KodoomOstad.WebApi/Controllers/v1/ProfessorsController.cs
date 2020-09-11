@@ -67,7 +67,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             var createdProfessor = _mapper.Map<ProfessorOutputDto>(professor);
 
-            return Created($"/api/v1/Professors/{createdProfessor.Id}", createdProfessor);
+            return Created($"api/v1/Professors/{createdProfessor.Id}", createdProfessor);
         }
 
         [HttpPut]
