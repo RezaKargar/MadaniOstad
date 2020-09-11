@@ -64,12 +64,10 @@ namespace KodoomOstad.WebApi.Controllers.v1
             var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
             var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
 
-            var isAdmin = await _userManager.IsInRoleAsync(userWhoSentRequest, "Admin");
-
             var isUserHimSelfRequesting = userWhoSentRequest.Id == dto.UserId;
 
-            if (!isAdmin && !isUserHimSelfRequesting)
-                return Forbid();
+            if (!isUserHimSelfRequesting)
+                return BadRequest("You can't create answer for others.");
 
 
             var user = await _userManager.FindByIdAsync(dto.UserId.ToString());
@@ -119,12 +117,10 @@ namespace KodoomOstad.WebApi.Controllers.v1
             var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
             var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
 
-            var isAdmin = await _userManager.IsInRoleAsync(userWhoSentRequest, "Admin");
-
             var isUserHimSelfRequesting = userWhoSentRequest.Id == answer.UserId;
 
-            if (!isAdmin && !isUserHimSelfRequesting)
-                return Forbid();
+            if (!isUserHimSelfRequesting)
+                return BadRequest("You can't update others' answers.");
 
             if (dto.Score != answer.Score)
             {
