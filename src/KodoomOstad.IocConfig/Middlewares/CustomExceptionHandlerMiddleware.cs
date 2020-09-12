@@ -1,14 +1,14 @@
 ﻿using KodoomOstad.Common.Exceptions;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.IdentityModel.Tokens;
 
 namespace KodoomOstad.IocConfig.Middlewares
 {
@@ -38,7 +38,7 @@ namespace KodoomOstad.IocConfig.Middlewares
         public async Task Invoke(HttpContext context)
         {
             string message = null;
-            
+
             HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
 
             try
@@ -47,7 +47,7 @@ namespace KodoomOstad.IocConfig.Middlewares
             }
             catch (AppException exception)
             {
-                
+
                 _logger.LogError(exception, exception.Message);
                 httpStatusCode = exception.StatusCode;
 
@@ -104,14 +104,11 @@ namespace KodoomOstad.IocConfig.Middlewares
             {
                 if (context.Response.HasStarted)
                     throw new InvalidOperationException("The response has already started, the http status code middleware will not be executed.");
-
+                
                 var result = new
                 {
-                    Exception = new
-                    {
-                        Data = data,
-                        Message = message
-                    }
+                    data = data,
+                    errors = new[] { message }
                 };
                 var json = JsonConvert.SerializeObject(result);
 

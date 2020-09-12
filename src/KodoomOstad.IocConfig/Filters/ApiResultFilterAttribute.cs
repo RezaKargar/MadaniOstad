@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Collections.Generic;
 using System.Linq;
+using KodoomOstad.Common.Exceptions;
 
 namespace KodoomOstad.IocConfig.Filters
 {
@@ -49,6 +50,13 @@ namespace KodoomOstad.IocConfig.Filters
                 context.Result = new NotFoundObjectResult(new
                 {
                     Errors = new[] { "Not Found" }
+                });
+            }
+            else if (context.Result is ForbidResult forbidResult)
+            {
+                context.Result = new NotFoundObjectResult(new
+                {
+                    Errors = new[] { "You don't have permission to access." }
                 });
             }
             base.OnResultExecuting(context);
