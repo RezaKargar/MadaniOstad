@@ -37,13 +37,15 @@ namespace KodoomOstad.WebApi.Controllers.v1
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IJwtService _jwtService;
+        private readonly RoleManager<IdentityRole<int>> _roleManager;
 
-        public UsersController(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager, IJwtService jwtService)
+        public UsersController(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager, IJwtService jwtService, RoleManager<IdentityRole<int>> roleManager)
         {
             _mapper = mapper;
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtService = jwtService;
+            _roleManager = roleManager;
         }
 
         [HttpPost("[action]")]
@@ -196,6 +198,147 @@ namespace KodoomOstad.WebApi.Controllers.v1
                 return BadRequest(deleteResult.Errors);
 
             return NoContent();
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("[action]/{userId:int}/{roleId:int}")]
+        public async Task<IActionResult> AddToRole(int userId, int roleId, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+                return NotFound("User not found.");
+
+            var role = await _roleManager.FindByIdAsync(roleId.ToString());
+            if (role == null)
+                return NotFound("Role not found.");
+
+            var addToRoleResult = await _userManager.AddToRoleAsync(user, role.Name);
+            if (!addToRoleResult.Succeeded)
+                return BadRequest(addToRoleResult.Errors);
+
+            return Ok();
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("[action]/{userId:int}/{roleName}")]
+        public async Task<IActionResult> AddToRole(int userId, string roleName, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+                return NotFound("User not found.");
+
+            var role = await _roleManager.FindByNameAsync(roleName);
+            if (role == null)
+                return NotFound("Role not found.");
+
+            var addToRoleResult = await _userManager.AddToRoleAsync(user, role.Name);
+            if (!addToRoleResult.Succeeded)
+                return BadRequest(addToRoleResult.Errors);
+
+            return Ok();
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("[action]/{userId:int}/{roleName}")]
+        public async Task<IActionResult> DeleteFromRole(int userId, string roleName, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+                return NotFound("User not found.");
+
+            var role = await _roleManager.FindByNameAsync(roleName);
+            if (role == null)
+                return NotFound("Role not found.");
+
+            var deleteFromRoleResult = await _userManager.RemoveFromRoleAsync(user, role.Name);
+            if (!deleteFromRoleResult.Succeeded)
+                return BadRequest(deleteFromRoleResult.Errors);
+
+            return NoContent();
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("[action]/{userId:int}/{roleId:int}")]
+        public async Task<IActionResult> DeleteFromRole(int userId, int roleId, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+                return NotFound("User not found.");
+
+            var role = await _roleManager.FindByIdAsync(roleId.ToString());
+            if (role == null)
+                return NotFound("Role not found.");
+
+            var deleteFromRoleResult = await _userManager.RemoveFromRoleAsync(user, role.Name);
+            if (!deleteFromRoleResult.Succeeded)
+                return BadRequest(deleteFromRoleResult.Errors);
+
+            return NoContent();
+        }
+
+        [HttpGet("{id:int}/[action]")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Roles(int id, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+                return NotFound();
+
+            var roleNames = await _userManager.GetRolesAsync(user);
+
+            var roles = new List<IdentityRole<int>>();
+            foreach (var roleName in roleNames)
+            {
+                var role = await _roleManager.FindByNameAsync(roleName);
+                roles.Add(role);
+            }
+
+            return Ok(roles);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("{userId:int}/[action]/{roleId:int}")]
+        public async Task<IActionResult> Roles(int userId, int roleId, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (user == null)
+                return NotFound("User not found.");
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var role = await _roleManager.FindByIdAsync(roleId.ToString());
+
+            if (role == null)
+                return NotFound("Role not found.");
+
+            if (!roles.Any(r => r == role.Name))
+                return NotFound("Role not found.");
+
+            return Ok(role);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("{userId:int}/[action]/{roleName}")]
+        public async Task<IActionResult> Roles(int userId, string roleName, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (user == null)
+                return NotFound("User not found.");
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            if (!roles.Any(r => r == roleName))
+                return NotFound("Role not found.");
+
+            var role = await _roleManager.FindByNameAsync(roleName);
+
+            if (role == null)
+                return NotFound("Role not found.");
+
+            return Ok(role);
         }
 
         [Authorize]
