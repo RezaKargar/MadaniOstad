@@ -1,12 +1,12 @@
 ﻿using KodoomOstad.Common.Exceptions;
 using KodoomOstad.IocConfig.Api;
+using KodoomOstad.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using KodoomOstad.Services;
 
 namespace KodoomOstad.IocConfig.Filters
 {
@@ -43,7 +43,7 @@ namespace KodoomOstad.IocConfig.Filters
                         break;
                 }
 
-                apiResult = new ApiResult(errorsList);
+                apiResult = new ApiResult(errors: errorsList.ToArray());
 
             }
             else if (context.Result is NotFoundObjectResult notFoundObjectResult)
