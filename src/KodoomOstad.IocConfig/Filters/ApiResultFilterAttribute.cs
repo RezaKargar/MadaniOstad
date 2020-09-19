@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using KodoomOstad.Common.Exceptions;
+using KodoomOstad.IocConfig.Api;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Collections.Generic;
 using System.Linq;
-using KodoomOstad.Common.Exceptions;
+using System.Net;
+using KodoomOstad.Services;
 
 namespace KodoomOstad.IocConfig.Filters
 {
@@ -11,11 +14,12 @@ namespace KodoomOstad.IocConfig.Filters
     {
         public override void OnResultExecuting(ResultExecutingContext context)
         {
-            if (context.Result is ObjectResult badRequestObjectResult && badRequestObjectResult.StatusCode == 400)
+            var apiResult = new ApiResult();
+
+            if (context.Result is BadRequestObjectResult badRequestObjectResult)
             {
                 var errorsList = new List<string>();
 
-                var a = badRequestObjectResult.Value;
                 switch (badRequestObjectResult.Value)
                 {
                     case ValidationProblemDetails validationProblemDetails:
@@ -39,27 +43,49 @@ namespace KodoomOstad.IocConfig.Filters
                         break;
                 }
 
-                context.Result = new JsonResult(new
-                {
-                    Errors = errorsList
-                });
+                apiResult = new ApiResult(errorsList);
 
             }
-            else if (context.Result is ObjectResult notFoundObjectResult && notFoundObjectResult.StatusCode == 404)
+            else if (context.Result is NotFoundObjectResult notFoundObjectResult)
             {
-                context.Result = new NotFoundObjectResult(new
-                {
-                    Errors = new[] { "Not Found" }
-                });
+                apiResult = new ApiResult(CastToStringArray(notFoundObjectResult.Value));
             }
-            else if (context.Result is ForbidResult forbidResult)
+            else if (context.Result is ObjectResult objectResult && objectResult.StatusCode == 404)
             {
-                context.Result = new NotFoundObjectResult(new
-                {
-                    Errors = new[] { "You don't have permission to access." }
-                });
+                context.Result = new NotFoundResult();
             }
+            else if (context.Result is ForbidResult)
+            {
+                apiResult = new ApiResult("You don't have permission to access.");
+            }
+            else if (context.Result is OkObjectResult okObjectResult)
+            {
+                if (!(okObjectResult.Value is AccessToken))
+                    apiResult = new ApiResult(okObjectResult.Value);
+            }
+            else if (context.Result is UnauthorizedObjectResult unauthorizedObjectResult)
+            {
+                apiResult = new ApiResult(CastToStringArray(unauthorizedObjectResult.Value));
+            }
+
+            var isContextResultChanged = apiResult.Data != null || apiResult.Errors.Any();
+            if (isContextResultChanged)
+                context.Result = new JsonResult(apiResult);
+
             base.OnResultExecuting(context);
+        }
+
+        private static string[] CastToStringArray(object value)
+        {
+            switch (value)
+            {
+                case string valueAsString:
+                    return new[] { valueAsString };
+                case string[] valueAsStringArray:
+                    return valueAsStringArray;
+                default:
+                    throw new AppException("Can't cast non-string or non-string array to string array", HttpStatusCode.InternalServerError);
+            }
         }
     }
 }

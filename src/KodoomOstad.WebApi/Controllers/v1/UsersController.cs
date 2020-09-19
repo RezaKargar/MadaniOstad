@@ -4,12 +4,25 @@ using KodoomOstad.Services.Services;
 using KodoomOstad.WebApi.Models.Answers;
 using KodoomOstad.WebApi.Models.AuthenticationModel;
 using KodoomOstad.WebApi.Models.Comments;
+using KodoomOstad.WebApi.Models.Common.ResponseExamples;
 using KodoomOstad.WebApi.Models.Courses;
 using KodoomOstad.WebApi.Models.Users;
+using KodoomOstad.WebApi.Models.Users.RequestExamples.Authenticate;
+using KodoomOstad.WebApi.Models.Users.RequestExamples.Create;
+using KodoomOstad.WebApi.Models.Users.RequestExamples.Put;
+using KodoomOstad.WebApi.Models.Users.ResponseExamples.Authenticate;
+using KodoomOstad.WebApi.Models.Users.ResponseExamples.Create;
+using KodoomOstad.WebApi.Models.Users.ResponseExamples.Delete;
+using KodoomOstad.WebApi.Models.Users.ResponseExamples.Get;
+using KodoomOstad.WebApi.Models.Users.ResponseExamples.GetList;
+using KodoomOstad.WebApi.Models.Users.ResponseExamples.Put;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -34,29 +47,25 @@ namespace KodoomOstad.WebApi.Controllers.v1
         }
 
         [HttpPost("[action]")]
+        [SwaggerRequestExample(typeof(AuthenticationModel), typeof(UserAuthenticateRequestExample))]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(object))]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(UserAuthenticateOkResponseExample))]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized, Type = typeof(object))]
+        [SwaggerResponseExample(StatusCodes.Status401Unauthorized, typeof(UserAuthenticateUnauthorizedResponseExample))]
         public async Task<IActionResult> Authenticate(AuthenticationModel model, CancellationToken cancellationToken)
         {
             var user = await _userManager.FindByNameAsync(model.Username);
 
             if (user == null)
-                return Unauthorized(new
-                {
-                    Errors = new[] { "Email or password is incorrect" }
-                });
+                return Unauthorized("Email or password is incorrect");
 
             var isValid = await _signInManager.CheckPasswordSignInAsync(user, model.Password, true);
 
             if (!isValid.Succeeded)
             {
                 if (!isValid.IsLockedOut)
-                    return Unauthorized(new
-                    {
-                        Errors = new[] { "User attempting to sign-in is lock out for a few minutes" }
-                    });
-                return Unauthorized(new
-                {
-                    Errors = new[] { "Email or password is incorrect" }
-                });
+                    return Unauthorized("User attempting to sign-in is lock out for a few minutes");
+                return Unauthorized("Email or password is incorrect");
             }
 
             var token = await _jwtService.GenerateAsync(user);
@@ -72,6 +81,12 @@ namespace KodoomOstad.WebApi.Controllers.v1
         }
 
         [HttpPost]
+        [SwaggerRequestExample(typeof(UsersCreateInputDto), typeof(UserCreateRequestExample))]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(object))]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(UserCreateOkResponseExample))]
+        [SwaggerResponseHeader(StatusCodes.Status200OK, "Location", "string", "api/v1/Users/1")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(object))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(UserCreateBadRequestResponseExample))]
         public async Task<IActionResult> Create(UsersCreateInputDto dto, CancellationToken cancellationToken)
         {
             var user = _mapper.Map<User>(dto);
@@ -91,6 +106,8 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(object))]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(UserGetListOkResponseExample))]
         public IActionResult Get()
         {
             var userDtos = _mapper.Map<List<UsersOutputDto>>(_userManager.Users);
@@ -100,6 +117,10 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
         [Authorize]
         [HttpGet("{id}")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(object))]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(UserGetOkResponseExample))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, Type = typeof(object))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundResponseExample))]
         public async Task<IActionResult> Get(int id, CancellationToken cancellationToken)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
@@ -122,6 +143,13 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
         [HttpPut("{id}")]
         [Authorize]
+        [SwaggerRequestExample(typeof(UsersUpdateInputDto), typeof(UserPutRequestExample))]
+        [SwaggerResponse(StatusCodes.Status204NoContent, Type = typeof(object))]
+        [SwaggerResponseExample(StatusCodes.Status204NoContent, typeof(NoContentResponseExample))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(object))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(UserPutBadRequestResponseExample))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, Type = typeof(object))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundResponseExample))]
         public async Task<IActionResult> Put(int id, UsersUpdateInputDto dto, CancellationToken cancellationToken)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
@@ -150,6 +178,12 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
+        [SwaggerResponse(StatusCodes.Status204NoContent, Type = typeof(object))]
+        [SwaggerResponseExample(StatusCodes.Status204NoContent, typeof(NoContentResponseExample))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(object))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(UserDeleteBadRequestResponseExample))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, Type = typeof(object))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundResponseExample))]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
@@ -196,7 +230,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             if (user == null)
                 return NotFound("User not found.");
-            
+
             var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
             var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
 

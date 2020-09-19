@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace KodoomOstad.IocConfig.SwaggerConfigurations
@@ -31,8 +33,33 @@ namespace KodoomOstad.IocConfig.SwaggerConfigurations
 
             if (_includeUnauthorizedAndForbiddenResponses)
             {
-                operation.Responses.TryAdd("401", new OpenApiResponse { Description = "Unauthorized" });
-                operation.Responses.TryAdd("403", new OpenApiResponse { Description = "Forbidden" });
+                var unauthorizedApiMediaTypes = new Dictionary<string, OpenApiMediaType>
+                {
+                    {
+                        "application/json", new OpenApiMediaType
+                        {
+                            Example = new OpenApiString(
+                                "{\n  \"errors\": [\n    \"Authentication needed.\"\n    ]\n}"
+                            )
+                        }
+                    }
+                };
+
+                var forbiddenApiMediaTypes = new Dictionary<string, OpenApiMediaType>
+                {
+                    {
+                        "application/json", new OpenApiMediaType
+                        {
+                            Example = new OpenApiString(
+                                "{\n  \"errors\": [\n    \"You don't have permission to access.\"\n    ]\n}"
+                            )
+                        }
+                    }
+                };
+
+
+                operation.Responses.TryAdd("401", new OpenApiResponse { Description = "Unauthorized", Content = unauthorizedApiMediaTypes });
+                operation.Responses.TryAdd("403", new OpenApiResponse { Description = "Forbidden", Content = forbiddenApiMediaTypes });
             }
 
             operation.Security.Add(new OpenApiSecurityRequirement

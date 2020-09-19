@@ -35,7 +35,7 @@ namespace KodoomOstad.WebApi
 
             services.AddDbContext<KodoomOstadDbContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("KodoomOstadDatabase"));
+                options.UseSqlServer(Configuration.GetConnectionString("KodoomOstadDatabase_MashhadHost"));
             });
 
             services.AddCors();
@@ -44,7 +44,8 @@ namespace KodoomOstad.WebApi
 
             services.InitializeAutoMapper();
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
 
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
