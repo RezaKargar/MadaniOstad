@@ -35,7 +35,7 @@ namespace KodoomOstad.WebApi
 
             services.AddDbContext<KodoomOstadDbContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("KodoomOstadDatabase_MashhadHost"));
+                options.UseSqlServer(Configuration.GetConnectionString("KodoomOstadDatabase"));
             });
 
             services.AddCors();
