@@ -38,7 +38,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Get(int id, CancellationToken cancellationToken)
         {
-            var role = await _roleManager.Roles.SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
+            var role = await _roleManager.FindByIdAsync(id.ToString());
 
             if (role == null)
                 return NotFound();
@@ -62,7 +62,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
         [HttpGet("{id:int}/Users")]
         public async Task<IActionResult> Users(int id, CancellationToken cancellationToken)
         {
-            var role = await _roleManager.Roles.SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
+            var role = await _roleManager.FindByIdAsync(id.ToString());
 
             if (role == null)
                 return NotFound("Role not found.");
@@ -94,7 +94,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
         [HttpGet("{roleId:int}/Users/{userId:int}")]
         public async Task<IActionResult> Users(int roleId, int userId, CancellationToken cancellationToken)
         {
-            var role = await _roleManager.Roles.SingleOrDefaultAsync(r => r.Id == roleId, cancellationToken);
+            var role = await _roleManager.FindByIdAsync(roleId.ToString());
 
             if (role == null)
                 return NotFound("Role not found.");
