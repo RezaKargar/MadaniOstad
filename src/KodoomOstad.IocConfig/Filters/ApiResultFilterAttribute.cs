@@ -83,6 +83,8 @@ namespace KodoomOstad.IocConfig.Filters
                     return new[] { valueAsString };
                 case string[] valueAsStringArray:
                     return valueAsStringArray;
+                case List<string> list:
+                    return list.ToArray();
                 default:
                     throw new AppException("Can't cast non-string or non-string array to string array", HttpStatusCode.InternalServerError);
             }
