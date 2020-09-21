@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Microsoft.AspNetCore.Http;
 
 namespace KodoomOstad.IocConfig.Filters
 {
@@ -15,7 +16,7 @@ namespace KodoomOstad.IocConfig.Filters
         public override void OnResultExecuting(ResultExecutingContext context)
         {
             var apiResult = new ApiResult();
-
+            var statusCode = StatusCodes.Status200OK;
             if (context.Result is BadRequestObjectResult badRequestObjectResult)
             {
                 var errorsList = new List<string>();
@@ -43,11 +44,13 @@ namespace KodoomOstad.IocConfig.Filters
                         break;
                 }
 
+                statusCode = StatusCodes.Status400BadRequest;
                 apiResult = new ApiResult(errors: errorsList.ToArray());
 
             }
             else if (context.Result is NotFoundObjectResult notFoundObjectResult)
             {
+                statusCode = StatusCodes.Status404NotFound;
                 apiResult = new ApiResult(CastToStringArray(notFoundObjectResult.Value));
             }
             else if (context.Result is ObjectResult objectResult && objectResult.StatusCode == 404)
@@ -56,6 +59,7 @@ namespace KodoomOstad.IocConfig.Filters
             }
             else if (context.Result is ForbidResult)
             {
+                statusCode = StatusCodes.Status403Forbidden;
                 apiResult = new ApiResult("You don't have permission to access.");
             }
             else if (context.Result is OkObjectResult okObjectResult)
@@ -65,12 +69,16 @@ namespace KodoomOstad.IocConfig.Filters
             }
             else if (context.Result is UnauthorizedObjectResult unauthorizedObjectResult)
             {
+                statusCode = StatusCodes.Status401Unauthorized;
                 apiResult = new ApiResult(CastToStringArray(unauthorizedObjectResult.Value));
             }
 
             var isContextResultChanged = apiResult.Data != null || apiResult.Errors.Any();
             if (isContextResultChanged)
-                context.Result = new JsonResult(apiResult);
+                context.Result = new JsonResult(apiResult)
+                {
+                    StatusCode = statusCode
+                };
 
             base.OnResultExecuting(context);
         }
