@@ -200,6 +200,32 @@ namespace KodoomOstad.WebApi.Controllers.v1
             return NoContent();
         }
 
+        [Authorize]
+        [HttpPut("[action]/{id:int}")]
+        public async Task<IActionResult> ChangePassword(int id, UsersChangePasswordInputDto dto, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+                return NotFound();
+
+            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
+            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
+
+            var isAdmin = await _userManager.IsInRoleAsync(userWhoSentRequest, "Admin");
+
+            var isUserHimselfRequesting = userWhoSentRequest.Id == user.Id;
+
+            if (!isAdmin && !isUserHimselfRequesting)
+                return Forbid();
+
+            var passwordChangeResult = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
+            if (!passwordChangeResult.Succeeded)
+                return BadRequest(passwordChangeResult.Errors);
+
+            return NoContent();
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPost("[action]/{userId:int}/{roleId:int}")]
         public async Task<IActionResult> AddToRole(int userId, int roleId, CancellationToken cancellationToken)
