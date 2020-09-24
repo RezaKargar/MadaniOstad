@@ -9,6 +9,8 @@ namespace KodoomOstad.WebApi.Models.Professors
 
         public string Name { get; set; }
 
+        public string Rank { get; set; }
+
         public string Avatar { get; set; }
 
         public string CreatedAt { get; set; }

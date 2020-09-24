@@ -11,6 +11,8 @@ namespace KodoomOstad.DataAccessLayer.Configurations
             builder.HasKey(e => e.Id);
 
             builder.Property(e => e.Name).IsRequired();
+
+            builder.Property(e => e.Rank).HasColumnType("tinyint").IsRequired();
         }
     }
 }
