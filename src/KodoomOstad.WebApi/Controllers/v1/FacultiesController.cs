@@ -72,7 +72,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
             if (faculty == null)
                 return NotFound();
 
-            if (faculty.Name == dto.Name || faculty.Slug != dto.Slug)
+            if (faculty.Name != dto.Name || faculty.Slug != dto.Slug)
             {
                 var isSlugDuplicated = await _facultyRepository
                         .TableNoTracking
