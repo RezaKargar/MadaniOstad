@@ -12,6 +12,8 @@ namespace KodoomOstad.DataAccessLayer.Configurations
 
             builder.Property(e => e.Name).IsRequired();
 
+            builder.Property(e => e.Slug).IsRequired();
+
             builder.Property(e => e.Rank).HasColumnType("tinyint").IsRequired();
 
             builder.Property(e => e.AverageRate).HasColumnType("float");

@@ -58,6 +58,12 @@ namespace KodoomOstad.WebApi.Controllers.v1
         {
             var professor = _mapper.Map<Professor>(dto);
 
+            var isSlugOrNameDuplicated = await _professorRepository.TableNoTracking.AnyAsync(p => p.Name == dto.Name || p.Slug == dto.Slug, cancellationToken);
+
+            if (isSlugOrNameDuplicated)
+                return BadRequest("Professor with same 'Name' or 'Slug' already exists.");
+
+
             var faculty = await _facultyRepository.GetByIdAsync(cancellationToken, dto.FacultyId);
 
             if (faculty == null)
@@ -78,6 +84,16 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             if (professor == null)
                 return NotFound();
+
+            if (professor.Name != dto.Name || professor.Slug != dto.Slug)
+            {
+                var isSlugDuplicated = await _professorRepository
+                    .TableNoTracking
+                    .AnyAsync(p => p.Name == dto.Name || p.Slug == dto.Slug, cancellationToken);
+
+                if (isSlugDuplicated)
+                    return BadRequest("Repository with same 'Name' or 'Slug' already exists.");
+            }
 
             if (dto.FacultyId != professor.FacultyId)
             {

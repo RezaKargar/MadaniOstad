@@ -8,7 +8,10 @@ namespace KodoomOstad.WebApi.Models.Professors
     {
         [Required]
         public string Name { get; set; }
-        
+
+        [Required]
+        public string Slug { get; set; }
+
         [Required]
         public ProfessorRank Rank { get; set; }
 
