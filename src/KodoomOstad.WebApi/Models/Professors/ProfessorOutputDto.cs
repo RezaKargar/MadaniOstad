@@ -11,6 +11,8 @@ namespace KodoomOstad.WebApi.Models.Professors
 
         public string Rank { get; set; }
 
+        public int AverageRate { get; set; }
+
         public string Avatar { get; set; }
 
         public string CreatedAt { get; set; }

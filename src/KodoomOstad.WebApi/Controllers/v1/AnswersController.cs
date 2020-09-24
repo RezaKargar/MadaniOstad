@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -102,6 +103,10 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             var createdAnswer = _mapper.Map<AnswersOutputDto>(answer);
 
+            professor.AverageRate = (int)professor.Answers.Average(x => x.Score);
+
+            await _professorRepository.UpdateAsync(professor, cancellationToken);
+
             return Created($"api/v1/Answers/{createdAnswer.Id}", createdAnswer);
         }
 
@@ -135,6 +140,13 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             await _answerRepository.UpdateAsync(answer, cancellationToken);
 
+
+            var professor = _professorRepository.GetById(answer.ProfessorId);
+
+            professor.AverageRate = (int)professor.Answers.Average(x => x.Score);
+
+            await _professorRepository.UpdateAsync(professor, cancellationToken);
+
             return NoContent();
         }
 
@@ -158,6 +170,13 @@ namespace KodoomOstad.WebApi.Controllers.v1
                 return Forbid();
 
             await _answerRepository.DeleteAsync(answer, cancellationToken);
+
+
+            var professor = _professorRepository.GetById(answer.ProfessorId);
+
+            professor.AverageRate = (int)professor.Answers.Average(x => x.Score);
+
+            await _professorRepository.UpdateAsync(professor, cancellationToken);
 
             return NoContent();
         }

@@ -12,6 +12,8 @@ namespace KodoomOstad.Entities.Models
 
         public ProfessorRank Rank { get; set; }
 
+        public int AverageRate { get; set; }
+
         public int FacultyId { get; set; }
         public Faculty Faculty { get; set; }
 
