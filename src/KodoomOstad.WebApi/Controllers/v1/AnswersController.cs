@@ -103,7 +103,10 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             var createdAnswer = _mapper.Map<AnswersOutputDto>(answer);
 
-            professor.AverageRate = (int)professor.Answers.Average(x => x.Score);
+
+            await _professorRepository.LoadCollectionAsync(professor, p => p.Answers, cancellationToken);
+
+            professor.AverageRate = (float)professor.Answers.Average(x => x.Score);
 
             await _professorRepository.UpdateAsync(professor, cancellationToken);
 
@@ -143,7 +146,9 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             var professor = _professorRepository.GetById(answer.ProfessorId);
 
-            professor.AverageRate = (int)professor.Answers.Average(x => x.Score);
+            await _professorRepository.LoadCollectionAsync(professor, p => p.Answers,cancellationToken);
+
+            professor.AverageRate = (float)professor.Answers.Average(x => x.Score);
 
             await _professorRepository.UpdateAsync(professor, cancellationToken);
 
@@ -174,7 +179,9 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             var professor = _professorRepository.GetById(answer.ProfessorId);
 
-            professor.AverageRate = (int)professor.Answers.Average(x => x.Score);
+            await _professorRepository.LoadCollectionAsync(professor, p => p.Answers, cancellationToken);
+
+            professor.AverageRate = (float)professor.Answers.Average(x => x.Score);
 
             await _professorRepository.UpdateAsync(professor, cancellationToken);
 
