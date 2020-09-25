@@ -1,5 +1,6 @@
 ﻿using KodoomOstad.Entities.Models;
 using KodoomOstad.IocConfig.CustomMapping;
+using System.Collections.Generic;
 
 namespace KodoomOstad.WebApi.Models.Comments
 {
@@ -18,5 +19,7 @@ namespace KodoomOstad.WebApi.Models.Comments
         public int ProfessorId { get; set; }
 
         public int UserId { get; set; }
+
+        public List<CommentsOutputDto> Replies { get; set; }
     }
 }
