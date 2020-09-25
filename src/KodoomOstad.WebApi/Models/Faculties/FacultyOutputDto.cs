@@ -1,5 +1,7 @@
 ﻿using KodoomOstad.Entities.Models;
 using KodoomOstad.IocConfig.CustomMapping;
+using KodoomOstad.WebApi.Models.Professors;
+using System.Collections.Generic;
 
 namespace KodoomOstad.WebApi.Models.Faculties
 {
@@ -14,5 +16,7 @@ namespace KodoomOstad.WebApi.Models.Faculties
         public string CreatedAt { get; set; }
 
         public string LastModifiedAt { get; set; }
+
+        public List<ProfessorOutputDto> Professors { get; set; }
     }
 }

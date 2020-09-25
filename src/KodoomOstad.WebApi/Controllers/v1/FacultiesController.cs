@@ -2,12 +2,10 @@
 using KodoomOstad.DataAccessLayer.Contracts;
 using KodoomOstad.Entities.Models;
 using KodoomOstad.WebApi.Models.Faculties;
-using KodoomOstad.WebApi.Models.Professors;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,7 +26,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
         [HttpGet]
         public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
-            var faculties = await _facultyRepository.Entities.ToListAsync(cancellationToken);
+            var faculties = await _facultyRepository.Entities.Include(f => f.Professors).ToListAsync(cancellationToken);
             var dtos = _mapper.Map<List<FacultyOutputDto>>(faculties);
             return Ok(dtos);
         }
@@ -39,6 +37,8 @@ namespace KodoomOstad.WebApi.Controllers.v1
             var faculty = await _facultyRepository.GetByIdAsync(cancellationToken, id);
             if (faculty == null)
                 return NotFound();
+
+            await _facultyRepository.LoadCollectionAsync(faculty, f => f.Professors, cancellationToken);
 
             var dto = _mapper.Map<FacultyOutputDto>(faculty);
             return Ok(dto);
@@ -98,39 +98,6 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             await _facultyRepository.DeleteAsync(faculty, cancellationToken);
             return NoContent();
-        }
-
-        [HttpGet("{id}/Professors")]
-        public async Task<IActionResult> Professors(int id, CancellationToken cancellationToken)
-        {
-            var faculty = await _facultyRepository.GetByIdAsync(cancellationToken, id);
-
-            if (faculty == null)
-                return NotFound();
-
-            await _facultyRepository.LoadCollectionAsync(faculty, f => f.Professors, cancellationToken);
-
-            var professors = _mapper.Map<List<ProfessorOutputDto>>(faculty.Professors);
-            return Ok(professors);
-        }
-
-        [HttpGet("{facultyId}/Professors/{professorId}")]
-        public async Task<IActionResult> Professors(int facultyId, int professorId, CancellationToken cancellationToken)
-        {
-            var faculty = await _facultyRepository.GetByIdAsync(cancellationToken, facultyId);
-
-            if (faculty == null)
-                return NotFound("Faculty not found.");
-
-            await _facultyRepository.LoadCollectionAsync(faculty, f => f.Professors, cancellationToken);
-
-            var professor = faculty.Professors.SingleOrDefault(p => p.Id == professorId);
-
-            if (professor == null)
-                return NotFound("Professor of faculty not found.");
-
-            var dto = _mapper.Map<ProfessorOutputDto>(professor);
-            return Ok(dto);
         }
     }
 }
