@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using KodoomOstad.DataAccessLayer.Contracts;
 using KodoomOstad.Entities.Models;
+using KodoomOstad.Services.Services;
 using KodoomOstad.WebApi.Models.Answers;
 using KodoomOstad.WebApi.Models.Comments;
 using KodoomOstad.WebApi.Models.Courses;
 using KodoomOstad.WebApi.Models.Professors;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -20,13 +22,19 @@ namespace KodoomOstad.WebApi.Controllers.v1
     {
         private readonly IMapper _mapper;
         private readonly IRepository<Professor> _professorRepository;
+        private readonly IRepository<Comment> _commentRepository;
         private readonly IRepository<Faculty> _facultyRepository;
+        private readonly IJwtService _jwtService;
+        private readonly UserManager<User> _userManager;
 
-        public ProfessorsController(IMapper mapper, IRepository<Professor> professorRepository, IRepository<Faculty> facultyRepository)
+        public ProfessorsController(IMapper mapper, IRepository<Professor> professorRepository, IRepository<Comment> commentRepository, IRepository<Faculty> facultyRepository, IJwtService jwtService, UserManager<User> userManager)
         {
             _mapper = mapper;
             _professorRepository = professorRepository;
+            _commentRepository = commentRepository;
             _facultyRepository = facultyRepository;
+            _jwtService = jwtService;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -156,6 +164,108 @@ namespace KodoomOstad.WebApi.Controllers.v1
             var dto = _mapper.Map<AnswersOutputDto>(answer);
 
             return Ok(dto);
+        }
+
+        [Authorize]
+        [HttpPost("{id:int}/Comments")]
+        public async Task<IActionResult> AddComment(int id, CommentsInputDto dto, CancellationToken cancellationToken)
+        {
+            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
+            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
+
+            var user = await _userManager.FindByIdAsync(userWhoSentRequest.Id.ToString());
+
+            var professor = await _professorRepository.GetByIdAsync(cancellationToken, id);
+
+            var notFoundMessages = new List<string>();
+
+            if (user == null)
+                notFoundMessages.Add("User not found.");
+
+            if (professor == null)
+                notFoundMessages.Add("Professor not found.");
+
+            if (dto.ReplyToId != null)
+            {
+                var commentToReply = await _commentRepository.GetByIdAsync(cancellationToken, dto.ReplyToId);
+
+                if (commentToReply == null)
+                    notFoundMessages.Add("Comment which meant to be parent, not found.");
+            }
+
+            if (notFoundMessages.Any())
+                return NotFound(notFoundMessages);
+
+
+            var comment = _mapper.Map<Comment>(dto);
+            comment.UserId = user.Id;
+
+            await _commentRepository.AddAsync(comment, cancellationToken);
+
+            var createdComment = _mapper.Map<CommentsOutputDto>(comment);
+
+            return Created($"api/v1/Professors/{professor.Id}/Comments/{createdComment.Id}", createdComment);
+        }
+
+        [Authorize]
+        [HttpPut("{professorId:int}/Comments/{commentId:int}")]
+        public async Task<IActionResult> UpdateComment(int professorId, int commentId, CommentsUpdateInputDto dto, CancellationToken cancellationToken)
+        {
+            var professor = await _professorRepository.GetByIdAsync(cancellationToken, professorId);
+
+            if (professor == null)
+                return NotFound("Professor not found.");
+
+            await _professorRepository.LoadCollectionAsync(professor, p => p.Comments, cancellationToken);
+
+            var comment = professor.Comments.SingleOrDefault(a => a.Id == commentId);
+
+            if (comment == null)
+                return NotFound("Comment of professor not found.");
+
+            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
+            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
+
+            var isUserHimSelfRequesting = userWhoSentRequest.Id == comment.UserId;
+
+            if (!isUserHimSelfRequesting)
+                return BadRequest("You can't update others' comment.");
+
+
+            _mapper.Map(dto, comment);
+
+            await _commentRepository.UpdateAsync(comment, cancellationToken);
+
+            return NoContent();
+        }
+
+        [Authorize]
+        [HttpDelete("{professorId:int}/Comments/{commentId:int}")]
+        public async Task<IActionResult> DeleteComment(int professorId, int commentId, CancellationToken cancellationToken)
+        {
+            var professor = await _professorRepository.GetByIdAsync(cancellationToken, professorId);
+
+            if (professor == null)
+                return NotFound("Professor not found.");
+
+            await _professorRepository.LoadCollectionAsync(professor, p => p.Comments, cancellationToken);
+
+            var comment = professor.Comments.SingleOrDefault(a => a.Id == commentId);
+
+            if (comment == null)
+                return NotFound("Comment of professor not found.");
+
+            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
+            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
+
+            var isUserHimSelfRequesting = userWhoSentRequest.Id == comment.UserId;
+
+            if (!isUserHimSelfRequesting)
+                return Forbid();
+
+            await _commentRepository.DeleteAsync(comment, cancellationToken);
+
+            return NoContent();
         }
 
         [HttpGet("{id}/Comments")]

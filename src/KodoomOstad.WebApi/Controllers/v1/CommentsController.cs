@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 namespace KodoomOstad.WebApi.Controllers.v1
 {
     [ApiVersion("1")]
+    [Authorize(Roles = "Admin")]
     public class CommentsController : BaseController
     {
         private readonly IMapper _mapper;
@@ -55,73 +56,6 @@ namespace KodoomOstad.WebApi.Controllers.v1
             return Ok(dto);
         }
 
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> Create(CommentsInputDto dto, CancellationToken cancellationToken)
-        {
-            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
-            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
-
-            var user = await _userManager.FindByIdAsync(userWhoSentRequest.Id.ToString());
-
-            var professor = await _professorRepository.GetByIdAsync(cancellationToken, dto.ProfessorId);
-
-            var notFoundMessages = new List<string>();
-
-            if (user == null)
-                notFoundMessages.Add("User not found.");
-
-            if (professor == null)
-                notFoundMessages.Add("Professor not found.");
-
-            if (dto.ReplyToId != null)
-            {
-                var commentToReply = await _commentRepository.GetByIdAsync(cancellationToken, dto.ReplyToId);
-
-                if (commentToReply == null)
-                    notFoundMessages.Add("Comment which meant to be parent, not found.");
-            }
-
-            if (notFoundMessages.Any())
-                return NotFound(notFoundMessages);
-
-
-            var comment = _mapper.Map<Comment>(dto);
-            comment.UserId = user.Id;
-
-            await _commentRepository.AddAsync(comment, cancellationToken);
-
-            var createdComment = _mapper.Map<CommentsOutputDto>(comment);
-
-            return Created($"api/v1/Comments/{createdComment.Id}", createdComment);
-        }
-
-        [Authorize]
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, CommentsUpdateInputDto dto, CancellationToken cancellationToken)
-        {
-            var comment = await _commentRepository.GetByIdAsync(cancellationToken, id);
-
-            if (comment == null)
-                return NotFound();
-
-            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
-            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
-
-            var isUserHimSelfRequesting = userWhoSentRequest.Id == comment.UserId;
-
-            if (!isUserHimSelfRequesting)
-                return BadRequest("You can't update others' comment.");
-
-
-            _mapper.Map(dto, comment);
-
-            await _commentRepository.UpdateAsync(comment, cancellationToken);
-
-            return NoContent();
-        }
-
-        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
@@ -129,16 +63,6 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             if (comment == null)
                 return NotFound();
-
-            var userWhoSentRequestId = _jwtService.GetIdFromToken(Request.Headers["Authorization"]);
-            var userWhoSentRequest = await _userManager.FindByIdAsync(userWhoSentRequestId);
-
-            var isAdmin = await _userManager.IsInRoleAsync(userWhoSentRequest, "Admin");
-
-            var isUserHimSelfRequesting = userWhoSentRequest.Id == comment.UserId;
-
-            if (!isAdmin && !isUserHimSelfRequesting)
-                return Forbid();
 
             await _commentRepository.DeleteAsync(comment, cancellationToken);
 

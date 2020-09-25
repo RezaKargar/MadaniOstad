@@ -9,8 +9,6 @@ namespace KodoomOstad.WebApi.Models.Comments
         [Required]
         public string Text { get; set; }
 
-        public int ProfessorId { get; set; }
-
         public int? ReplyToId { get; set; }
     }
 }
