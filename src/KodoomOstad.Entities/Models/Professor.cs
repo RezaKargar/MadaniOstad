@@ -16,6 +16,8 @@ namespace KodoomOstad.Entities.Models
 
         public float AverageRate { get; set; }
 
+        public bool IsFacultyMember { get; set; }
+
         public int FacultyId { get; set; }
         public Faculty Faculty { get; set; }
 

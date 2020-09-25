@@ -17,6 +17,8 @@ namespace KodoomOstad.WebApi.Models.Professors
 
         public string Avatar { get; set; }
 
+        public bool IsFacultyMember { get; set; }
+
         [Required]
         public int FacultyId { get; set; }
     }
