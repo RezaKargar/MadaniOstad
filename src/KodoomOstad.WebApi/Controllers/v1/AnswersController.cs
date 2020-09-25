@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -92,6 +91,13 @@ namespace KodoomOstad.WebApi.Controllers.v1
             if (notFoundMessages.Any())
                 return NotFound(notFoundMessages);
 
+            var isAnswerDuplicate = await _answerRepository.TableNoTracking.AnyAsync(a =>
+                a.UserId == user.Id && a.ProfessorId == professor.Id && a.PollQuestionId == pollQuestion.Id, cancellationToken);
+
+            if (isAnswerDuplicate)
+                return BadRequest("You have already answered this poll question.");
+
+
             if (dto.Score < pollQuestion.MinScore || dto.Score > pollQuestion.MaxScore)
                 return BadRequest(
                     $"Score must be something between {pollQuestion.MinScore} and {pollQuestion.MaxScore}");
@@ -146,7 +152,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             var professor = _professorRepository.GetById(answer.ProfessorId);
 
-            await _professorRepository.LoadCollectionAsync(professor, p => p.Answers,cancellationToken);
+            await _professorRepository.LoadCollectionAsync(professor, p => p.Answers, cancellationToken);
 
             professor.AverageRate = (float)professor.Answers.Average(x => x.Score);
 
