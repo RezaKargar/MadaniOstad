@@ -199,6 +199,7 @@ namespace KodoomOstad.WebApi.Controllers.v1
 
             var comment = _mapper.Map<Comment>(dto);
             comment.UserId = user.Id;
+            comment.ProfessorId = professor.Id;
 
             await _commentRepository.AddAsync(comment, cancellationToken);
 
