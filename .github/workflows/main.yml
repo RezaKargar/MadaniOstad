@@ -1,0 +1,46 @@
+name: Deploy to server
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+ 
+jobs:
+  Build_and_Deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore
+      
+    - name: Publish
+      run:  dotnet publish ./src/KodoomOstad.WebApi/KodoomOstad.WebApi.csproj -c Release --framework netcoreapp3.1 --no-dependencies --no-restore -o ./publish 
+    
+    - name: Replace secrets in appsettings.json
+      run: |
+        sed -E -i 's/("KodoomOstadDatabase"\s*:\s*)".*"/\1"${{ secrets.DB_CONNECTION_STRING }}"/g' ./publish/appsettings.json
+        sed -E -i 's/("SecretKey"\s*:\s*)".*"/\1"${{ secrets.JWT_SECRET_KEY }}"/g' ./publish/appsettings.json
+    
+    - name: Check replacement
+      run: cat ./publish/appsettings.json
+    
+    - name: 📂 Sync files
+      uses: SamKirkland/FTP-Deploy-Action@4.1.0
+      with:
+        server: ${{ secrets.FTP_SERVER_IP }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        port: ${{ secrets.FTP_PORT }}
+        local-dir: ./publish/
+        server-dir: ${{ secrets.PROEJCT_PATH_ON_FTP_SERVER }}
