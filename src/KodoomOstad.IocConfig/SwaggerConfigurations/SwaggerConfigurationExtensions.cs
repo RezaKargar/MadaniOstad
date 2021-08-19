@@ -67,7 +67,7 @@ namespace KodoomOstad.IocConfig.SwaggerConfigurations
                     {
                         Password = new OpenApiOAuthFlow
                         {
-                            TokenUrl = new Uri("https://localhost:5001/api/v1/Users/AuthenticateForSwagger"),
+                            TokenUrl = new Uri("/api/v1/Users/AuthenticateForSwagger", UriKind.Relative),
                         }
                     }
                 });
