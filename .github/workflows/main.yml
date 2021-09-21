@@ -25,11 +25,11 @@ jobs:
       run: dotnet build --no-restore
       
     - name: Publish
-      run:  dotnet publish ./src/KodoomOstad.WebApi/KodoomOstad.WebApi.csproj -c Release --framework netcoreapp3.1 --no-dependencies --no-restore -o ./publish 
+      run:  dotnet publish ./src/MadaniOstad.WebApi/MadaniOstad.WebApi.csproj -c Release --framework netcoreapp3.1 --no-dependencies --no-restore -o ./publish 
     
     - name: Replace secrets in appsettings.json
       run: |
-        sed -E -i 's/("KodoomOstadDatabase"\s*:\s*)".*"/\1"${{ secrets.DB_CONNECTION_STRING }}"/g' ./publish/appsettings.json
+        sed -E -i 's/("MadaniOstadDatabase"\s*:\s*)".*"/\1"${{ secrets.DB_CONNECTION_STRING }}"/g' ./publish/appsettings.json
         sed -E -i 's/("SecretKey"\s*:\s*)".*"/\1"${{ secrets.JWT_SECRET_KEY }}"/g' ./publish/appsettings.json
     
     - name: Check replacement
