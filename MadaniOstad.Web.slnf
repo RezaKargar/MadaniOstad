@@ -1,0 +1,15 @@
+{
+  "solution": {
+    "path": "MadaniOstad.sln",
+    "projects": [
+      "src\\MadaniOstad.Common\\MadaniOstad.Common.csproj",
+      "src\\MadaniOstad.DataAccessLayer\\MadaniOstad.DataAccessLayer.csproj",
+      "src\\MadaniOstad.Entities\\MadaniOstad.Entities.csproj",
+      "src\\MadaniOstad.IocConfig\\MadaniOstad.IocConfig.csproj",
+      "src\\MadaniOstad.Services\\MadaniOstad.Services.csproj",
+      "src\\MadaniOstad.WebApi\\MadaniOstad.WebApi.csproj",
+      "tests\\MadaniOstad.IntegrationTests\\MadaniOstad.IntegrationTests.csproj",
+      "tests\\MadaniOstad.UnitTests\\MadaniOstad.UnitTests.csproj"
+    ]
+  }
+}

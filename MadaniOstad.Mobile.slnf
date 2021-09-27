@@ -1,0 +1,11 @@
+{
+  "solution": {
+    "path": "MadaniOstad.sln",
+    "projects": [
+      "src\\MadaniOstad.Mobile\\MadaniOstad.Mobile.Android\\MadaniOstad.Mobile.Android.csproj",
+      "src\\MadaniOstad.Mobile\\MadaniOstad.Mobile.UWP\\MadaniOstad.Mobile.UWP.csproj",
+      "src\\MadaniOstad.Mobile\\MadaniOstad.Mobile.iOS\\MadaniOstad.Mobile.iOS.csproj",
+      "src\\MadaniOstad.Mobile\\MadaniOstad.Mobile\\MadaniOstad.Mobile.csproj"
+    ]
+  }
+}
