@@ -31,7 +31,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MadaniOstad.Mobile.Android"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MadaniOstad.Mobile.iOS", "src\MadaniOstad.Mobile\MadaniOstad.Mobile.iOS\MadaniOstad.Mobile.iOS.csproj", "{86515E3C-BA36-46B1-9D9C-44BC984BA809}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MadaniOstad.Mobile", "src\MadaniOstad.Mobile\MadaniOstad.Mobile\MadaniOstad.Mobile.csproj", "{DF673C3E-0841-49CC-BE31-8743F4EFBFC6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MadaniOstad.Mobile", "src\MadaniOstad.Mobile\MadaniOstad.Mobile\MadaniOstad.Mobile.csproj", "{DF673C3E-0841-49CC-BE31-8743F4EFBFC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

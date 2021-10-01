@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MadaniOstad.Mobile.App">
     <Application.Resources>
-
+        <Style TargetType="Label">
+            <Setter Property="FontFamily" Value="BYekan"/>
+        </Style>
     </Application.Resources>
 </Application>

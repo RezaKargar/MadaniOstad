@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -11,12 +11,47 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Fonts\B Yekan.ttf" />
+    <None Remove="Resources\Images\ClosedEye.png" />
+    <None Remove="Resources\Images\Email.png" />
+    <None Remove="Resources\Images\Eye.png" />
+    <None Remove="Resources\Images\IdCard.png" />
+    <None Remove="Resources\Images\Lock.png" />
+    <None Remove="Resources\Images\Person.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Fonts\B Yekan.ttf" />
+    <EmbeddedResource Include="Resources\Images\ClosedEye.png" />
+    <EmbeddedResource Include="Resources\Images\Email.png" />
+    <EmbeddedResource Include="Resources\Images\Eye.png" />
+    <EmbeddedResource Include="Resources\Images\IdCard.png" />
+    <EmbeddedResource Include="Resources\Images\Lock.png" />
+    <EmbeddedResource Include="Resources\Images\Person.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\MadaniOstad.Entities\MadaniOstad.Entities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Pages\SignupPage.xaml.cs">
+      <DependentUpon>SignupPage.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="CustomControls\MaterialUIEntryPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Pages\SignupPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
   </ItemGroup>
   
 </Project>

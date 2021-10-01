@@ -1,6 +1,5 @@
-﻿using System;
+﻿using MadaniOstad.Mobile.Pages;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
 
 namespace MadaniOstad.Mobile
 {
@@ -10,7 +9,8 @@ namespace MadaniOstad.Mobile
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            //MainPage = new MainPage();
+            MainPage = new SignupPage();
         }
 
         protected override void OnStart()

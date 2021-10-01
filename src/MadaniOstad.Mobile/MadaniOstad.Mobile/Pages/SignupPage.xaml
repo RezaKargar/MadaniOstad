@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:MadaniOstad.Mobile.CustomControls"
+             xmlns:extensions="clr-namespace:MadaniOstad.Mobile.Extensions;assembly=MadaniOstad.Mobile"
+             x:Class="MadaniOstad.Mobile.Pages.SignupPage"
+             FlowDirection="RightToLeft">
+
+    <ScrollView>
+        <StackLayout Padding="20, 10"
+                     Spacing="10">
+
+            <Label HorizontalOptions="Start"
+                   TextColor="Black"
+                   FontSize="30" >ایجاد حساب</Label>
+
+            <local:MaterialUIEntryPage
+                Image="{extensions:ImageResource MadaniOstad.Mobile.Resources.Images.Person.png}"
+                Placeholder="نام و نام خانوادگی" />
+
+            <local:MaterialUIEntryPage
+                Image="{extensions:ImageResource MadaniOstad.Mobile.Resources.Images.Email.png}"
+                Keyboard="Email"
+                Placeholder="ایمیل" />
+
+            <local:MaterialUIEntryPage
+                Image="{extensions:ImageResource MadaniOstad.Mobile.Resources.Images.IdCard.png}"
+                Keyboard="Numeric"
+                Placeholder="شماره دانشجویی" />
+
+            <local:MaterialUIEntryPage
+                Image="{extensions:ImageResource MadaniOstad.Mobile.Resources.Images.Lock.png}"
+                IsPassword="True"
+                Placeholder="رمز عبور" />
+
+            <local:MaterialUIEntryPage
+                Image="{extensions:ImageResource MadaniOstad.Mobile.Resources.Images.Lock.png}"
+                IsPassword="True"
+                Placeholder="تکرار رمز عبور" />
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>
