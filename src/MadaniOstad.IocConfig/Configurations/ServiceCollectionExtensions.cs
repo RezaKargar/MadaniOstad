@@ -57,8 +57,8 @@ namespace MadaniOstad.IocConfig.Configurations
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(secretKey),
 
-                    RequireExpirationTime = true,
-                    ValidateLifetime = true,
+                    RequireExpirationTime = jwtSettings.ExpirationMinutes.HasValue && jwtSettings.ExpirationMinutes.Value > 0,
+                    ValidateLifetime = jwtSettings.ExpirationMinutes.HasValue && jwtSettings.ExpirationMinutes.Value > 0,
 
                     ValidateAudience = true,
                     ValidAudience = jwtSettings.Audience,

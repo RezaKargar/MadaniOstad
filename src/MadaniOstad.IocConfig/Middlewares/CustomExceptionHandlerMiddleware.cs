@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MadaniOstad.IocConfig.Middlewares
@@ -23,11 +23,11 @@ namespace MadaniOstad.IocConfig.Middlewares
     public class CustomExceptionHandlerMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
         private readonly ILogger<CustomExceptionHandlerMiddleware> _logger;
 
         public CustomExceptionHandlerMiddleware(RequestDelegate next,
-            IHostingEnvironment env,
+            IWebHostEnvironment env,
             ILogger<CustomExceptionHandlerMiddleware> logger)
         {
             _next = next;
@@ -51,9 +51,9 @@ namespace MadaniOstad.IocConfig.Middlewares
                 _logger.LogError(exception, exception.Message);
                 httpStatusCode = exception.StatusCode;
 
-                if (_env.IsDevelopment())
+                if (_env.EnvironmentName == "Development")
                 {
-                    var dic = new Dictionary<string, string>
+                    Dictionary<string, string> dic = new Dictionary<string, string>
                     {
                         ["Exception"] = exception.Message,
                         ["StackTrace"] = exception.StackTrace,
@@ -64,7 +64,7 @@ namespace MadaniOstad.IocConfig.Middlewares
                         dic.Add("InnerException.StackTrace", exception.InnerException.StackTrace);
                     }
 
-                    message = JsonConvert.SerializeObject(dic);
+                    message = JsonSerializer.Serialize(dic);
                 }
                 else
                 {
@@ -88,14 +88,14 @@ namespace MadaniOstad.IocConfig.Middlewares
             {
                 _logger.LogError(exception, exception.Message);
 
-                if (_env.IsDevelopment())
+                if (_env.EnvironmentName == "Development")
                 {
-                    var dic = new Dictionary<string, string>
+                    Dictionary<string, string> dic = new Dictionary<string, string>
                     {
                         ["Exception"] = exception.Message,
                         ["StackTrace"] = exception.StackTrace,
                     };
-                    message = JsonConvert.SerializeObject(dic);
+                    message = JsonSerializer.Serialize(dic);
                 }
                 await WriteToResponseAsync(exception.Data);
             }
@@ -103,14 +103,16 @@ namespace MadaniOstad.IocConfig.Middlewares
             async Task WriteToResponseAsync(object data)
             {
                 if (context.Response.HasStarted)
+                {
                     throw new InvalidOperationException("The response has already started, the http status code middleware will not be executed.");
-                
+                }
+
                 var result = new
                 {
                     data = data,
                     errors = new[] { message }
                 };
-                var json = JsonConvert.SerializeObject(result);
+                string json = JsonSerializer.Serialize(result);
 
                 context.Response.StatusCode = (int)httpStatusCode;
                 context.Response.ContentType = "application/json";
@@ -121,17 +123,19 @@ namespace MadaniOstad.IocConfig.Middlewares
             {
                 httpStatusCode = HttpStatusCode.Unauthorized;
 
-                if (_env.IsDevelopment())
+                if (_env.EnvironmentName == "Development")
                 {
-                    var dic = new Dictionary<string, string>
+                    Dictionary<string, string> dic = new Dictionary<string, string>
                     {
                         ["Exception"] = exception.Message,
                         ["StackTrace"] = exception.StackTrace
                     };
                     if (exception is SecurityTokenExpiredException tokenException)
+                    {
                         dic.Add("Expires", tokenException.Expires.ToString());
+                    }
 
-                    message = JsonConvert.SerializeObject(dic);
+                    message = JsonSerializer.Serialize(dic);
                 }
             }
         }

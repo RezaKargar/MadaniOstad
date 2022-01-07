@@ -16,7 +16,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.x
+        dotnet-version: 5.0.x
         
     - name: Restore dependencies
       run: dotnet restore
@@ -25,7 +25,7 @@ jobs:
       run: dotnet build --no-restore
       
     - name: Publish
-      run:  dotnet publish ./src/MadaniOstad.WebApi/MadaniOstad.WebApi.csproj -c Release --framework netcoreapp3.1 --no-dependencies --no-restore -o ./publish 
+      run:  dotnet publish ./src/MadaniOstad.WebApi/MadaniOstad.WebApi.csproj -c Release --framework net5.0 --no-dependencies --no-restore -o ./publish 
     
     - name: Replace secrets in appsettings.json
       run: |
