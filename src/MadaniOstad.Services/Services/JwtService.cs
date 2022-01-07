@@ -33,13 +33,27 @@ namespace MadaniOstad.Services.Services
 
             var claims = await _getClaimsAsync(user);
 
+            var notBeforeMintues = 0;
+            var expiresMintues = 0;
+
+            if (_siteSetting.JwtSettings.NotBeforeMinutes.HasValue && _siteSetting.JwtSettings.NotBeforeMinutes.Value > 0)
+            {
+                notBeforeMintues = _siteSetting.JwtSettings.NotBeforeMinutes.Value;
+                expiresMintues = _siteSetting.JwtSettings.NotBeforeMinutes.Value;
+            }
+
+            if (_siteSetting.JwtSettings.ExpirationMinutes.HasValue && _siteSetting.JwtSettings.ExpirationMinutes.Value > 0)
+            {
+                expiresMintues = _siteSetting.JwtSettings.ExpirationMinutes.Value;
+            }
+
             var descriptor = new SecurityTokenDescriptor
             {
                 Issuer = _siteSetting.JwtSettings.Issuer,
                 Audience = _siteSetting.JwtSettings.Audience,
                 IssuedAt = DateTime.Now,
-                NotBefore = DateTime.Now.AddMinutes(_siteSetting.JwtSettings.NotBeforeMinutes),
-                Expires = DateTime.Now.AddMinutes(_siteSetting.JwtSettings.ExpirationMinutes),
+                NotBefore = DateTime.Now.AddMinutes(notBeforeMintues),
+                Expires = DateTime.Now.AddMinutes(expiresMintues),
                 SigningCredentials = signingCredentials,
                 Subject = new ClaimsIdentity(claims)
             };
